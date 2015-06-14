@@ -26,11 +26,16 @@
 
 #include "spark_protocol_functions.h"
 
+#define PP_CAT(a, b) PP_CAT_I(a, b)
+#define PP_CAT_I(a, b) PP_CAT_II(~, a ## b)
+#define PP_CAT_II(p, res) res
 
-#define __STARTUP(code, __startup_name) \
-    struct __startup_name {  __startup_name() { code; }; __startup_name __instance##__startup_name;
+#define UNIQUE_NAME(base) PP_CAT(base, __COUNTER__)
 
-#define STARTUP(x)  __STARTUP(x, __startup##)
+#define __STARTUP(code) \
+    struct __startup_##__LINE__ {  __startup_##__LINE__() { code; } }; __startup_##__LINE__ __instance_startup_##__LINE__;
+
+#define STARTUP(x)  __STARTUP(x)
 
 
 struct __ApplicationProductID {
