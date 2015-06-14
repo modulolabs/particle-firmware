@@ -30,18 +30,21 @@
 // DYNALIB_IMPORT is defined to produce a set of function stubs
 //
 
+// DYNALIB_EXETRN_C to mark symbols with C linkage
+#ifdef __cplusplus
+#define DYNALIB_EXTERN_C extern "C"
+#define EXTERN_C DYNALIB_EXTERN_C
+#else
+#define DYNALIB_EXTERN_C
+#define EXTERN_C extern
+#endif
+
 #define DYNALIB_TABLE_EXTERN(tablename) \
-    extern const void* const dynalib_##tablename[];
+    EXTERN_C const void* const dynalib_##tablename[];
 
 #define DYNALIB_TABLE_NAME(tablename) \
     dynalib_##tablename
 
-// DYNALIB_EXETRN_C to mark symbols with C linkage
-#ifdef __cplusplus
-#define DYNALIB_EXTERN_C extern "C"
-#else
-#define DYNALIB_EXTERN_C
-#endif
 
 #ifdef DYNALIB_EXPORT
 
@@ -63,7 +66,7 @@
 
 #elif defined(DYNALIB_IMPORT)
 
-    #ifdef __arm__ 
+    #ifdef __arm__
 
         #define DYNALIB_BEGIN(tablename)    \
             extern const void* dynalib_location_##tablename;
@@ -94,7 +97,7 @@
         #define DYNALIB_END(name)
     #else
         #error Unknown architecture
-    #endif // __arm__        
+    #endif // __arm__
 #endif
 
 
