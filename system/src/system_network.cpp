@@ -239,6 +239,8 @@ const WLanConfig* network_config(network_handle_t network, uint32_t param, void*
 
 void network_connect(network_handle_t network, uint32_t flags, uint32_t param, void* reserved)
 {
+    SYSTEM_THREAD_CONTEXT();
+
     if (!network_ready(0, 0, NULL))
     {
         WLAN_DISCONNECT = 0;
@@ -269,6 +271,8 @@ void network_connect(network_handle_t network, uint32_t flags, uint32_t param, v
 
 void network_disconnect(network_handle_t network, uint32_t param, void* reserved)
 {
+    SYSTEM_THREAD_CONTEXT();
+
     if (network_ready(0, 0, NULL))
     {
         WLAN_DISCONNECT = 1; //Do not ARM_WLAN_WD() in WLAN_Async_Callback()
@@ -289,6 +293,8 @@ bool network_connecting(network_handle_t network, uint32_t param, void* reserved
 
 void network_on(network_handle_t network, uint32_t flags, uint32_t param, void* reserved)
 {
+    SYSTEM_THREAD_CONTEXT();
+
     if (!SPARK_WLAN_STARTED)
     {
         wlan_activate();
@@ -307,6 +313,8 @@ bool network_has_credentials(network_handle_t network, uint32_t param, void* res
 
 void network_off(network_handle_t network, uint32_t flags, uint32_t param, void* reserved)
 {
+    SYSTEM_THREAD_CONTEXT();
+
     if (SPARK_WLAN_STARTED)
     {
         cloud_disconnect();
@@ -330,6 +338,8 @@ void network_off(network_handle_t network, uint32_t flags, uint32_t param, void*
 
 void network_listen(network_handle_t, uint32_t, void*)
 {
+    SYSTEM_THREAD_CONTEXT();
+
     WLAN_SMART_CONFIG_START = 1;
 }
 
@@ -342,9 +352,13 @@ bool network_listening(network_handle_t, uint32_t, void*)
     return false;
 }
 
+void network_set_credentials_async(NetworkCredentials* credentials)
+{
+    SYSTEM_THREAD_CONTEXT_FN1(wlan_set_credentials, credentials, credentials->len);
+}
+
 void network_set_credentials(network_handle_t, uint32_t, NetworkCredentials* credentials, void*)
 {
-
     if (!SPARK_WLAN_STARTED || !credentials)
     {
         return;
@@ -359,11 +373,13 @@ void network_set_credentials(network_handle_t, uint32_t, NetworkCredentials* cre
 
     credentials->security = security;
 
-    wlan_set_credentials(credentials);
+    network_set_credentials_async(credentials);
 }
 
 bool network_clear_credentials(network_handle_t, uint32_t, NetworkCredentials* creds, void*)
 {
+    // todo - run this on the system thread
+
     return wlan_clear_credentials() == 0;
 }
 

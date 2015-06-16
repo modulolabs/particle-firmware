@@ -42,19 +42,24 @@ SubscriptionScope::Enum convert(Spark_Subscription_Scope_TypeDef subscription_ty
     return(subscription_type==MY_DEVICES) ? SubscriptionScope::MY_DEVICES : SubscriptionScope::FIREHOSE;
 }
 
+bool register_event(const char* eventName, SubscriptionScope::Enum event_scope, const char* deviceID)
+{
+    bool success;
+    if (deviceID)
+        success = spark_protocol_send_subscription_device(sp, eventName, deviceID);
+    else
+        success = spark_protocol_send_subscription_scope(sp, eventName, event_scope);
+    return success;
+}
+
 bool spark_subscribe(const char *eventName, EventHandler handler, void* data,
         Spark_Subscription_Scope_TypeDef scope, const char* deviceID, void* reserved)
 {
-    SYSTEM_THREAD_CONTEXT_SYNC();
-
     auto event_scope = convert(scope);
     bool success = spark_protocol_add_event_handler(sp, eventName, handler, event_scope, deviceID, NULL);
     if (success && spark_connected())
     {
-        if (deviceID)
-            success = spark_protocol_send_subscription_device(sp, eventName, deviceID);
-        else
-            success = spark_protocol_send_subscription_scope(sp, eventName, event_scope);
+        register_event(eventName, event_scope, deviceID);
     }
     return success;
 }
@@ -71,8 +76,6 @@ bool spark_send_event(const char* name, const char* data, int ttl, Spark_Event_T
 
 bool spark_variable(const char *varKey, const void *userVar, Spark_Data_TypeDef userVarType, void* reserved)
 {
-    SYSTEM_THREAD_CONTEXT_SYNC();
-
     User_Var_Lookup_Table_t* item = NULL;
     if (NULL != userVar && NULL != varKey && strlen(varKey)<=USER_VAR_KEY_LENGTH)
     {
