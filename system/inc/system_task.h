@@ -29,14 +29,14 @@
 
 #include "socket_hal.h"
 #include "system_cloud.h"
-#include "wlan_hal.h"    
+#include "wlan_hal.h"
 
 #ifdef __cplusplus
 extern "C" {
-#endif    
+#endif
 
 uint32_t HAL_WLAN_SetNetWatchDog(uint32_t timeOutInuS);
-void SPARK_WLAN_Setup(void (*presence_announcement_callback)(void));
+void SPARK_WLAN_Setup();
 
 /**
  * Run background processing. This function should be called as often as possible by user code.
@@ -46,7 +46,7 @@ void Spark_Idle_Events(bool force_events);
 inline void Spark_Idle() { Spark_Idle_Events(false); }
 
 /**
- * The old method 
+ * The old method
  */
 void SPARK_WLAN_Loop(void) __attribute__ ((deprecated("Please use Spark.process() instead.")));
 inline void SPARK_WLAN_Loop(void) { spark_process(); }

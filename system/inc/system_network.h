@@ -34,21 +34,21 @@ extern "C" {
 
 #ifndef SPARK_NO_WIFI
 #define SPARK_NO_WIFI 0
-#endif    
-    
+#endif
+
 #if SPARK_NO_WIFI
 #undef SPARK_NO_CLOUD
-#define SPARK_NO_CLOUD 1    
+#define SPARK_NO_CLOUD 1
 #endif
-    
+
 typedef network_interface_t    network_handle_t;
 const network_interface_t NIF_DEFAULT = 0;
-    
+
 /**
  * This is a bridge from the wiring layer to the system layer.
- * @return 
+ * @return
  */
-    
+
 const WLanConfig* network_config(network_handle_t network, uint32_t param1, void* reserved);
 
 void network_connect(network_handle_t network, uint32_t flags, uint32_t param1, void* reserved);
@@ -58,14 +58,14 @@ bool network_ready(network_handle_t network, uint32_t param1, void* reserved);
 void network_on(network_handle_t network, uint32_t flags, uint32_t param1, void* reserved);
 void network_off(network_handle_t network, uint32_t flags, uint32_t param1, void* reserved);
 
-void network_listen(network_handle_t network, uint32_t flags, void* reserved);
+void network_listen(network_handle_t network, uint32_t param1, void* reserved);
 bool network_listening(network_handle_t network, uint32_t param1, void* reserved);
 
 
 bool network_has_credentials(network_handle_t network, uint32_t param1, void* reserved);
 
 typedef WLanCredentials NetworkCredentials;
-    
+
 void network_set_credentials(network_handle_t network, uint32_t flags, NetworkCredentials* creds, void* reserved);
 bool network_clear_credentials(network_handle_t network, uint32_t flags, NetworkCredentials* creds, void* reserved);
 

@@ -36,12 +36,11 @@
 #include "spark_wiring_network.h"
 #include "spark_wiring_constants.h"
 #include "spark_wiring_cloud.h"
+#include "system_threading.h"
 
 using spark::Network;
 
 volatile system_tick_t spark_loop_total_millis = 0;
-
-void (*announce_presence)(void);
 
 // Auth options are WLAN_SEC_UNSEC, WLAN_SEC_WPA, WLAN_SEC_WEP, and WLAN_SEC_WPA2
 unsigned char _auth = WLAN_SEC_WPA2;
@@ -51,26 +50,6 @@ unsigned char wlan_profile_index;
 volatile uint8_t SPARK_LED_FADE = 1;
 
 volatile uint8_t Spark_Error_Count;
-
-void SPARK_WLAN_Setup(void (*presence_announcement_callback)(void))
-{
-    announce_presence = presence_announcement_callback;
-
-#if !SPARK_NO_WIFI
-    wlan_setup();
-
-    /* Trigger a WLAN device */
-    if (system_mode() == AUTOMATIC || system_mode()==SAFE_MODE)
-    {
-        network_connect(Network, 0, 0, NULL);
-    }
-#endif
-
-#ifndef SPARK_NO_CLOUD
-    //Initialize spark protocol callbacks for all System modes
-    Spark_Protocol_Init();
-#endif
-}
 
 static int cfod_count = 0;
 
