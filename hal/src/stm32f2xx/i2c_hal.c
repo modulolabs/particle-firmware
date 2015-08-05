@@ -175,6 +175,11 @@ uint32_t HAL_I2C_Request_Data(uint8_t address, uint8_t quantity, uint8_t stop)
     _millis = HAL_Timer_Get_Milli_Seconds();
     while(!I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED))
     {
+        if (I2C_CheckEvent(I2C1, I2C_EVENT_SLAVE_ACK_FAILURE)) {
+            I2C_GenerateSTOP(I2C1, ENABLE);
+            return 0;
+        }
+
         if(EVENT_TIMEOUT < (HAL_Timer_Get_Milli_Seconds() - _millis))
         {
             /* Send STOP Condition */
@@ -259,6 +264,11 @@ uint8_t HAL_I2C_End_Transmission(uint8_t stop)
     _millis = HAL_Timer_Get_Milli_Seconds();
     while(!I2C_CheckEvent(I2C1, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED))
     {
+        if (I2C_CheckEvent(I2C1, I2C_EVENT_SLAVE_ACK_FAILURE)) {
+            I2C_GenerateSTOP(I2C1, ENABLE);
+            return 4;
+        }
+
         if(EVENT_TIMEOUT < (HAL_Timer_Get_Milli_Seconds() - _millis))
         {
             /* Send STOP Condition */
